@@ -6,6 +6,7 @@ from django.core.validators import MaxLengthValidator
 
 class Streamplatformserializer(serializers.ModelSerializer):
     model=StreamPlatform
+    field='__all__'
     
 
 class Watchlistserializer(serializers.ModelSerializer):
