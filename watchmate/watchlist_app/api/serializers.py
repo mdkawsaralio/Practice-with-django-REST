@@ -1,18 +1,28 @@
 from rest_framework import serializers
-from watchlist_app.models import StreamPlatform,Watchlist
+from watchlist_app.models import StreamPlatform,Watchlist,Reviews
 from django.core.validators import MaxLengthValidator
 
 
 
-class Streamplatformserializer(serializers.ModelSerializer):
-    model=StreamPlatform
-    field='__all__'
-    
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Reviews
+        exclude=('watchlist',)
 
 class Watchlistserializer(serializers.ModelSerializer):
-    model=Watchlist
-    field='__all__'
+    reviews=ReviewSerializer(many=True,read_only=True)
+    class Meta:
+        model=Watchlist
+        fields='__all__'
 
+
+class Streamplatformserializer(serializers.HyperlinkedModelSerializer):
+    watchlist_data=Watchlistserializer(many=True,read_only=True)
+    #watchlist_data=serializers.StringRelatedField(many=True)
+    #watchlist_data=serializers.HyperlinkedRelatedField(many=True,read_only=True,view_name='movie-details')
+    class Meta:
+        model=StreamPlatform
+        fields='__all__'
 
 
 

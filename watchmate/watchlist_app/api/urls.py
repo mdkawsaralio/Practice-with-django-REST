@@ -1,11 +1,24 @@
 
 
 
-from django.urls import path
-from watchlist_app.api.views import Movielist,MovieDetails,StreamPlatform
+from django.urls import path,include
+from watchlist_app.api.views import Movielist,MovieDetails,Reviewlist,ReviewDetails,ReviewCreate,StreamflatfromdetailsVS
+from rest_framework.routers import DefaultRouter
+
+routers=DefaultRouter()
+# routers.register('stream',StreamflatformVS,basename='streamplatform')
+routers.register('stream',StreamflatfromdetailsVS,basename='streamplatform')
+
+
 
 urlpatterns = [
     path('list/',Movielist.as_view(),name='movie-list'),
-    path('<int:pk>',MovieDetails.as_view(),name='movie-details'),
-    path('stream/',StreamPlatform.as_view(),name='stream-platform')
+    path('list/<int:pk>',MovieDetails.as_view(),name='movie-details'),
+    path('',include(routers.urls)),
+    # path('stream/',StreamPlatformAV.as_view(),name='stream-platform'),
+    # path('stream/<int:pk>',StreamDetailsAV.as_view(),name='streamplatform-detail'),
+    
+    path('stream/<int:pk>/review-create',ReviewCreate.as_view(),name='review-create'),
+    path('stream/<int:pk>/review',Reviewlist.as_view(),name='review-list'),
+    path('stream/review/<int:pk>',ReviewDetails.as_view(),name='review-details'),
 ]
