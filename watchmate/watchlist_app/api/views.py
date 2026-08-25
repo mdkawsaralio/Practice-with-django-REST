@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics,mixins,viewsets
-
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from watchlist_app.api.permission import AdminorReadonly,ReviewuserorReadonly
+from django.db.models.aggregates import Count,Avg
 
 
 # class StreamflatformVS(viewsets.ReadOnlyModelViewSet):
@@ -18,7 +21,7 @@ class StreamflatfromdetailsVS(viewsets.ModelViewSet):
 
 
 class Reviewlist(generics.ListAPIView):
-    
+    permission_classes=[IsAuthenticated]
     serializer_class=ReviewSerializer
 
     def get_queryset(self):
@@ -27,16 +30,35 @@ class Reviewlist(generics.ListAPIView):
 
 class ReviewCreate(generics.CreateAPIView):
     serializer_class=ReviewSerializer
+    
+    
+    def get_queryset(self):
+        return Reviews.objects.all()
+    
     def perform_create(self, serializer):
         pk=self.kwargs.get('pk')
         movie=Watchlist.objects.get(pk=pk)
-        serializer.save(watchlist=movie)
+        user=self.request.user
+        review_queryset=Reviews.objects.filter(watchlist=movie,review_user=user)
+        
+        if review_queryset.exists():
+            raise ValidationError("you have already reviewed this movie")
+        rating = serializer.validated_data['rating']
+
+
+        movie.avg_rating = ((movie.avg_rating * movie.number_rating) + rating) / (movie.number_rating + 1)
+
+        movie.number_rating += 1
+        movie.save()
+
+        print("AFTER:", movie.avg_rating, movie.number_rating)
+        serializer.save(watchlist=movie,review_user=user)
         
 
 class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset=Reviews.objects.all()
     serializer_class=ReviewSerializer
-
+    permission_classes=[ReviewuserorReadonly]
 
 
 
