@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'watchlist_app',
     'rest_framework',
+    'rest_framework.authtoken',
+    'user_app',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +139,10 @@ MAILERS = {
 #     ]
 # }
 REST_FRAMEWORK={
-    'DEFAULT_PERMISSION_CLASSES':[
-        'rest_framework.permissions.BasicAuthentication'
-    ]
+    # 'DEFAULT_PERMISSION_CLASSES':[
+    #     'rest_framework.permissions.BasicAuthentication'
+    # ],
+   'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }

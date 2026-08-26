@@ -89,7 +89,7 @@ class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
 
 
 class Movielist(APIView):
-    
+    permission_classes=[AdminorReadonly]
     def get(self,request):
         movie=Watchlist.objects.all()
         serializer=Watchlistserializer(movie,many=True)
@@ -104,6 +104,8 @@ class Movielist(APIView):
         
 
 class MovieDetails(APIView):
+    
+    permission_classes=[AdminorReadonly]
     
     def get(self,request,pk):
         try:
